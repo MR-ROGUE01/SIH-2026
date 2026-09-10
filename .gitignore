@@ -7,10 +7,6 @@ __pycache__/
 .env
 .env.*
 
-# Data
-Dataset/
-data/
-
 # Models
 models/
 *.pt
@@ -18,10 +14,13 @@ models/
 *.onnx
 *.safetensors
 
-# Vector indexes
-*.faiss
-vector_db/
-Index/
+# Raw satellite TIFs (large ~67MB each — regenerate with Data_download.py)
+Dataset/ranchi_2020_01.tif
+Dataset/ranchi_2020_06.tif
+Dataset/ranchi_2021_06.tif
+Dataset/ranchi_2022_12.tif
+Dataset/ranchi_2023_06.tif
+Dataset/ranchi_2024_12.tif
 
 # Jupyter
 .ipynb_checkpoints/

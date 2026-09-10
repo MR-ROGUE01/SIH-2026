@@ -1,0 +1,55 @@
+{
+  "problem_statement_id": "26227",
+  "problem_statement_title": "Semantic Retrieval and Multi-Temporal Change Analysis of Satellite Imagery",
+  "evaluating_organization": "Ministry of Defence (MoD) | Indian Army (DGIS)",
+  "evaluation_timestamp": "2026-09-10 17:54:15",
+  "geospatial_parameters": {
+    "area_of_interest": "Ranchi Urban and Peri-Urban Environs, Jharkhand, India",
+    "bounding_box": {
+      "west_lon": 85.15,
+      "east_lon": 85.45,
+      "south_lat": 23.2,
+      "north_lat": 23.45
+    },
+    "indexed_ground_area_km2": 868.0,
+    "spatial_resolution_meters": 10.0,
+    "spectral_bands": [
+      "B02 (Blue)",
+      "B03 (Green)",
+      "B04 (Red)",
+      "B08 (Near-Infrared)"
+    ]
+  },
+  "archive_and_index_metrics": {
+    "number_of_source_scenes": 6,
+    "temporal_epochs": [
+      "2020-01",
+      "2020-06",
+      "2021-06",
+      "2022-12",
+      "2023-06",
+      "2024-12"
+    ],
+    "total_pristine_tiles": 180,
+    "tile_pixel_dimensions": "512 x 512 px",
+    "embedding_dimension": 512,
+    "vector_index_type": "FAISS IndexFlatIP (Cosine Distance / Inner Product)",
+    "incremental_ingestion_supported": true
+  },
+  "performance_and_latency": {
+    "mean_search_query_latency_ms": 88.28,
+    "median_search_query_latency_ms": 74.81,
+    "sub_second_retrieval": true
+  },
+  "storage_footprint_mb": {
+    "tile_imagery_mb": 271.7,
+    "vector_index_and_metadata_mb": 0.5,
+    "total_dataset_storage_mb": 715.23
+  },
+  "hardware_and_environment": {
+    "operating_system": "Windows 10",
+    "processor": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+    "total_system_ram_gb": 15.2,
+    "execution_mode": "100% On-Premises Air-Gapped Sovereign Operation"
+  }
+}
