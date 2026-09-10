@@ -1,0 +1,6 @@
+rank,query,score,tile_file,acquisition_date,lat_min,lat_max,lon_min,lon_max,sensor
+1,ranchi_2020_06_tile_0_1.tif,1.0,ranchi_2020_06_tile_0_1.tif,2020-06-01,23.404406,23.451203,85.19657,85.247283,Sentinel-2 L2A
+2,ranchi_2020_06_tile_0_1.tif,0.9455,ranchi_2020_06_tile_0_2.tif,2020-06-01,23.404976,23.451758,85.246674,85.297372,Sentinel-2 L2A
+3,ranchi_2020_06_tile_0_1.tif,0.9296,ranchi_2020_06_tile_0_0.tif,2020-06-01,23.40382,23.450631,85.146467,85.197197,Sentinel-2 L2A
+4,ranchi_2020_06_tile_0_1.tif,0.9208,ranchi_2020_06_tile_2_1.tif,2020-06-01,23.311953,23.358748,85.197822,85.248498,Sentinel-2 L2A
+5,ranchi_2020_06_tile_0_1.tif,0.9156,ranchi_2020_06_tile_1_1.tif,2020-06-01,23.35818,23.404976,85.197197,85.247891,Sentinel-2 L2A

@@ -1,0 +1,35 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Secrets
+.env
+.env.*
+
+# Data
+Dataset/
+data/
+
+# Models
+models/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Vector indexes
+*.faiss
+vector_db/
+Index/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
