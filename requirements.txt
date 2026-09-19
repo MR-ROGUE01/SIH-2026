@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+Pillow
+faiss-cpu
+scikit-learn
+rasterio
+torch
+torchvision
+open-clip-torch
+scipy
