@@ -137,16 +137,16 @@ tab1, tab2, tab3, tab4 = st.tabs([
 
 with tab1:
     st.header("📋 Change Review Queue")
-    st.caption("Yahan detected changes dikhte hain — Confirm karo ya Reject karo")
+    st.caption("Review and verify multi-temporal change detections — Validate or dismiss flagged anomalies")
 
     if not os.path.exists(REVIEW_QUEUE_FILE):
-        st.warning("Queue file nahi mili. Pehle chalao: `python CODE/false_alarm_suppression.py`")
+        st.warning("Review queue not found. Please execute the suppression pipeline: `python CODE/false_alarm_suppression.py`")
     else:
         with open(REVIEW_QUEUE_FILE, "r", encoding="utf-8") as f:
             queue = json.load(f)
 
         if not queue:
-            st.info("Abhi koi candidate nahi hai review ke liye.")
+            st.info("No candidates currently pending review.")
         else:
             col_filter1, col_filter2 = st.columns([2, 1])
             with col_filter1:
@@ -161,7 +161,7 @@ with tab1:
                 and c.get("adjusted_confidence", c.get("confidence", 0)) >= min_conf
             ]
 
-            st.write(f"**{len(filtered_queue)}** candidates dikh rahe hain:")
+            st.write(f"**{len(filtered_queue)}** candidates identified:")
 
             options = [
                 f"#{i+1} | {c['change_type'].upper()} | Conf: {c.get('adjusted_confidence', c['confidence']):.3f} | {c['before_date']} → {c['after_date']} | Objects: {c.get('num_objects_marked', 0)}"
@@ -169,7 +169,7 @@ with tab1:
             ]
 
             if options:
-                selected_idx = st.selectbox("Candidate choose karo:", range(len(options)), format_func=lambda i: options[i])
+                selected_idx = st.selectbox("Select Target Candidate:", range(len(options)), format_func=lambda i: options[i])
                 cand = filtered_queue[selected_idx]
                 cand_id = f"{cand.get('row',0)}_{cand.get('col',0)}_{cand['before_date']}_{cand['after_date']}"
 
@@ -185,7 +185,7 @@ with tab1:
                 if preview_path and os.path.exists(preview_path):
                     st.image(preview_path, use_container_width=True, caption=f"BEFORE | AFTER (with marked objects) | CHANGE HEATMAP — {preview_file}")
                 else:
-                    st.warning("Preview image nahi mila.")
+                    st.warning("Preview imagery unavailable.")
 
                 with st.expander("🔍 Full Details (Location, Sensor, Suppression info)", expanded=False):
                     p_col1, p_col2 = st.columns(2)
@@ -200,19 +200,19 @@ with tab1:
                         st.markdown(f"**Seasonal Penalty**: `{cand.get('seasonal_penalty', 0.0)}`")
                         st.markdown(f"**Suppression Flags**: `{', '.join(cand.get('suppression_reasons', ['None']))}`")
 
-                st.subheader("Apna Decision Do")
+                st.subheader("Analyst Verification")
                 notes_input = st.text_area("Notes (optional):", placeholder="e.g., New road confirmed near river bend.", key=f"note_{cand_id}")
 
                 col_btn1, col_btn2, _ = st.columns([1, 1, 3])
                 with col_btn1:
                     if st.button("✅ Confirm Change", type="primary", use_container_width=True):
                         save_decision(cand_id, "CONFIRMED", notes_input, cand)
-                        st.success("Confirmed! Audit trail me save ho gaya.")
+                        st.success("Confirmed! Event recorded in audit trail.")
                         st.rerun()
                 with col_btn2:
                     if st.button("❌ Reject (False Alarm)", use_container_width=True):
                         save_decision(cand_id, "REJECTED", notes_input, cand)
-                        st.warning("Rejected! Audit trail me save ho gaya.")
+                        st.warning("Rejected! False alarm logged in audit trail.")
                         st.rerun()
 
 
@@ -222,40 +222,40 @@ with tab1:
 
 with tab2:
     st.header("🔍 Smart Search")
-    st.caption("Text ya tile image deke satellite tiles search karo")
+    st.caption("Semantic natural language and image-to-image similarity search over satellite archives")
 
-    query_type = st.radio("Search Type:", ["Text (Words mein likho)", "Image (Tile choose karo)"], horizontal=True)
+    query_type = st.radio("Search Modality:", ["Text Query (Natural Language)", "Image Query (Reference Tile)"], horizontal=True)
 
     search_query = ""
     image_tile_name = ""
 
-    if query_type == "Text (Words mein likho)":
-        st.markdown("**Quick search buttons:**")
+    if query_type == "Text Query (Natural Language)":
+        st.markdown("**Example queries:**")
         q_cols = st.columns(4)
-        if q_cols[0].button("🌊 River ke paas structures"):
+        if q_cols[0].button("🌊 Structures near river"):
             st.session_state["sq"] = "newly built structures near a river"
-        if q_cols[1].button("🚜 Open ground vehicles"):
+        if q_cols[1].button("🚜 Vehicle concentrations"):
             st.session_state["sq"] = "large vehicle concentrations on open ground"
-        if q_cols[2].button("🛣️ Road construction"):
+        if q_cols[2].button("🛣️ Road development"):
             st.session_state["sq"] = "road development area"
         if q_cols[3].button("🏗️ Construction site"):
             st.session_state["sq"] = "construction site"
 
-        search_query = st.text_input("Query likho:", value=st.session_state.get("sq", "dense urban area"))
+        search_query = st.text_input("Enter search prompt:", value=st.session_state.get("sq", "dense urban area"))
     else:
         all_tiles = sorted(os.listdir(TILES_DIR)) if os.path.exists(TILES_DIR) else []
-        image_tile_name = st.selectbox("Tile choose karo:", all_tiles)
+        image_tile_name = st.selectbox("Select reference tile:", all_tiles)
 
     col_opt1, col_opt2 = st.columns(2)
     with col_opt1:
-        top_k = st.slider("Kitne results chahiye:", 3, 10, 5)
+        top_k = st.slider("Top Results (K):", 3, 10, 5)
     with col_opt2:
-        date_filter = st.selectbox("Year filter:", ["All Dates", "2020", "2021", "2022", "2023", "2024"])
+        date_filter = st.selectbox("Temporal Filter (Year):", ["All Dates", "2020", "2021", "2022", "2023", "2024"])
 
-    if st.button("🔎 Search Karo", type="primary"):
+    if st.button("🔎 Execute Search", type="primary"):
         with st.spinner("Searching satellite tiles..."):
             date_arg = f"--date-from {date_filter}-01-01 --date-to {date_filter}-12-31" if date_filter != "All Dates" else ""
-            if query_type == "Text (Words mein likho)":
+            if query_type == "Text Query (Natural Language)":
                 cmd = f'python CODE/semantic_search.py --query "{search_query}" --top {top_k} {date_arg}'
             else:
                 cmd = f'python CODE/semantic_search.py --image "{image_tile_name}" --top {top_k} {date_arg}'
@@ -264,7 +264,7 @@ with tab2:
         csv_path = os.path.join(SEARCH_DIR, "search_results.csv")
         if os.path.exists(csv_path):
             df_results = pd.read_csv(csv_path)
-            st.success(f"{len(df_results)} matching tiles mile!")
+            st.success(f"{len(df_results)} matching tiles retrieved successfully.")
 
             cols = st.columns(min(len(df_results), 5))
             for i, (_, row) in enumerate(df_results.iterrows()):
@@ -293,23 +293,23 @@ with tab2:
 
 with tab3:
     st.header("🌐 Find Similar Locations")
-    st.caption("Koi bhi tile choose karo — system automatically similar jagahein dhundhega")
+    st.caption("Unsupervised site discovery — retrieve locations with equivalent semantic and spectral signatures")
 
-    subtab1, subtab2 = st.tabs(["🎯 Similar Sites Dhundo", "📊 Terrain Clusters"])
+    subtab1, subtab2 = st.tabs(["🎯 Similar Sites Retrieval", "📊 Latent Terrain Clusters"])
 
     with subtab1:
-        st.subheader("Koi tile choose karo, similar locations milenge")
+        st.subheader("Reference Tile Selection")
 
         all_tiles = sorted(os.listdir(TILES_DIR)) if os.path.exists(TILES_DIR) else []
-        chosen_tile = st.selectbox("Target Tile:", all_tiles, key="disc_tile")
+        chosen_tile = st.selectbox("Select Target Tile:", all_tiles, key="disc_tile")
 
-        if st.button("⚡ Similar Sites Dhundo", type="primary"):
+        if st.button("⚡ Discover Similar Sites", type="primary"):
             with st.spinner("Searching similar locations..."):
                 try:
                     from clustering_discovery import find_similar_sites
                     similar_results = find_similar_sites(chosen_tile, top_k=6)
                     if similar_results:
-                        st.success(f"{len(similar_results)} similar sites mile!")
+                        st.success(f"{len(similar_results)} similar locations discovered.")
                         cols = st.columns(len(similar_results))
                         from semantic_search import tile_to_rgb
                         for idx, res in enumerate(similar_results):
@@ -325,12 +325,12 @@ with tab3:
                                     except Exception:
                                         st.code(res["tile_file"])
                     else:
-                        st.info("Koi similar site nahi mila.")
+                        st.info("No matching locations found above similarity threshold.")
                 except Exception as e:
                     st.error(f"Error: {e}")
 
     with subtab2:
-        st.subheader("8 Terrain Clusters (Auto-grouped by satellite AI)")
+        st.subheader("8 Unsupervised Terrain Archetypes (KMeans k=8 Clustering)")
         if os.path.exists(CLUSTERS_FILE):
             with open(CLUSTERS_FILE, "r", encoding="utf-8") as f:
                 c_data = json.load(f)
@@ -344,8 +344,8 @@ with tab3:
                 })
             st.dataframe(pd.DataFrame(summary_list), use_container_width=True)
         else:
-            st.info("Clusters abhi nahi bane. Neeche button dabao:")
-            if st.button("Build Clusters"):
+            st.info("Cluster index not yet generated. Initialize below:")
+            if st.button("Initialize Clustering Pipeline"):
                 os.system("python CODE/clustering_discovery.py --build_clusters")
                 st.rerun()
 
@@ -356,7 +356,7 @@ with tab3:
 
 with tab4:
     st.header("📑 Analyst Decisions")
-    st.caption("Tumhare saare confirm/reject decisions yahan save hote hain")
+    st.caption("Comprehensive audit trail and forensic verification log of analyst decisions")
 
     decisions = load_decisions()
     if decisions:
@@ -372,7 +372,7 @@ with tab4:
             mime="text/csv"
         )
     else:
-        st.info("Abhi koi decision nahi hua. Tab 1 (Change Review Queue) mein jao aur candidates review karo.")
+        st.info("No analyst decisions recorded yet. Review pending candidates in the Change Review Queue.")
 
     st.divider()
     st.subheader("📊 System Info")
